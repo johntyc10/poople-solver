@@ -35,6 +35,7 @@ class PoopleSolver():
             return [self.target_word]
 
         tree = [[self.start_word]]
+        visited = {self.start_word}
         layer = 1
         while True:
             print(f"-> Looking through layer {layer} ({len(tree)} words)...")
@@ -44,7 +45,9 @@ class PoopleSolver():
                 if self.target_word in possible_next_words:
                     return word_history + [self.target_word]
                 for w in possible_next_words:
-                    new_tree.append(word_history + [w])
+                    if w not in visited:
+                        new_tree.append(word_history + [w])
+                    visited.add(w)
 
             tree = copy.deepcopy(new_tree)
             layer += 1
