@@ -1,13 +1,5 @@
 import copy
 
-try:
-    from tqdm import tqdm
-    print("tqdm is installed, loading bar will appear.")
-except ImportError:
-    print("tqdm is not installed, loading bar will not appear.")
-    def tqdm(iterable):
-        return iterable
-
 class PoopleSolver():
     def __init__(self) -> None:
         self.all_words = self._load_all_words()
@@ -40,7 +32,7 @@ class PoopleSolver():
         while True:
             print(f"-> Looking through layer {layer} ({len(tree)} words)...")
             new_tree = []
-            for word_history in tqdm(tree):
+            for word_history in tree:
                 possible_next_words = self.get_possible_next_words(word_history[-1])
                 if self.target_word in possible_next_words:
                     return word_history + [self.target_word]
