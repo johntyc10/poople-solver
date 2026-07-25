@@ -67,10 +67,14 @@ class PoopleSolver():
         print(f"\"{self.target_word}\" is chosen.")
 
         # Start solving
-        print("Solving poople, this may take a while...")
+        print("Solving poople...")
 
-        result = self.solve()
-        print(result)
+        solution = self.solve()
+        print("Solution found.")
+        print("Solution:")
+        for i in range(len(solution)):
+            print(f"{i}: {solution[i]}")
+        print(f"The best solution takes {len(solution) - 1} guesses.")
 
 
 if __name__ == "__main__":
