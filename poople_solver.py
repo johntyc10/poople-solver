@@ -1,66 +1,9 @@
-import copy
+from poople_solver_base import PoopleSolverBase
 
-class PoopleSolver():
+
+class PoopleSolver(PoopleSolverBase):
     def __init__(self) -> None:
-        self.all_words = self._load_all_words()
-        self.word_frequency_dict = self._load_word_frequency()
-
-    def _load_all_words(self) -> list[str]:
-        with open("words/wordDist.txt", "r") as f:
-            content = f.read()
-        return [word_dist.split(",")[0] for word_dist in content.split("\n") if word_dist]
-
-    def _load_word_frequency(self) -> dict[str, int]:
-        with open("words/wordFrequency.txt", "r") as f:
-            content = f.read()
-        result = dict()
-        for word_freq in content.split("\n"):
-            if not word_freq: continue
-            word, freq = word_freq.split(",")
-            freq = int(freq)
-            result[word] = freq
-        return result
-
-    def is_in_all_words(self, word: str) -> bool:
-        return word in self.all_words
-
-    def is_exactly_one_letter_apart(self, word1: str, word2: str) -> bool:
-        counter = 0
-        for i in range(len(word1)):
-            if word1[i] != word2[i]:
-                counter += 1
-        return counter == 1
-
-    def get_possible_next_words(self, word: str) -> list[str]:
-        return [w for w in self.all_words if self.is_exactly_one_letter_apart(word, w)]
-
-    def solve(self) -> list[list[str]]:  # bfs search
-        if self.start_word == self.target_word:
-            return [self.target_word]
-
-        tree = [[self.start_word]]
-        visited = {self.start_word}
-        last_visited = set()
-        solutions = []  # may have more than one solution
-        layer = 1
-        while not solutions:
-            print(f"-> Looking through layer {layer} ({len(tree)} words)...")
-            new_tree = []
-            for word_history in tree:
-                possible_next_words = self.get_possible_next_words(word_history[-1])
-                if self.target_word in possible_next_words:
-                    solutions.append(word_history + [self.target_word])
-                for w in possible_next_words:
-                    if w not in visited:
-                        new_tree.append(word_history + [w])
-                    last_visited.add(w)
-
-            visited = visited.union(last_visited)
-            last_visited = set()
-            tree = copy.deepcopy(new_tree)
-            layer += 1
-
-        return solutions
+        super().__init__()
 
     def get_sol_freq_sum(self, solution: list[str]) -> int:
         _sum = 0
