@@ -3,11 +3,23 @@ import copy
 class PoopleSolver():
     def __init__(self) -> None:
         self.all_words = self._load_all_words()
+        self.word_frequency_dict = self._load_word_frequency()
 
     def _load_all_words(self) -> list[str]:
         with open("words/wordDist.txt", "r") as f:
             content = f.read()
-        return [word_dist.split(",")[0] for word_dist in content.split("\n")]
+        return [word_dist.split(",")[0] for word_dist in content.split("\n") if word_dist]
+
+    def _load_word_frequency(self) -> dict[str, int]:
+        with open("words/wordFrequency.txt", "r") as f:
+            content = f.read()
+        result = dict()
+        for word_freq in content.split("\n"):
+            if not word_freq: continue
+            word, freq = word_freq.split(",")
+            freq = int(freq)
+            result[word] = freq
+        return result
 
     def is_in_all_words(self, word: str) -> bool:
         return word in self.all_words
@@ -50,6 +62,19 @@ class PoopleSolver():
 
         return solutions
 
+    def get_sol_freq_sum(self, solution: list[str]) -> int:
+        _sum = 0
+        for word in solution:
+            _sum += self.word_frequency_dict[word]
+        return _sum
+
+    def get_most_human_solution(self, solutions: list[list[str]]) -> list[str]:
+        freq_sums = []
+        for sol in solutions:
+            freq_sums.append(self.get_sol_freq_sum(sol))
+
+        return solutions[freq_sums.index(max(freq_sums))]
+
     def play(self):
         print("===== POOPLE SOLVER =====")
         print("A script that uses brute force method to solve poople (guaranteed best solution)")
@@ -76,11 +101,12 @@ class PoopleSolver():
         print("Solving poople...")
 
         solutions = self.solve()
-        print(f"{len(solutions)} solutions found.")
-        print("First solution:")
-        for i in range(len(solutions[0])):
-            print(f"{i}: {solutions[0][i]}")
-        print(f"The best solution takes {len(solutions[0]) - 1} guesses.")
+        print(f"{len(solutions)} solution(s) found.")
+        print("Most human solution:")
+        most_human_sol = self.get_most_human_solution(solutions)
+        for i in range(len(most_human_sol)):
+            print(f"{i}: {most_human_sol[i]}")
+        print(f"The best solution(s) takes {len(most_human_sol) - 1} guesses.")
 
 
 if __name__ == "__main__":
