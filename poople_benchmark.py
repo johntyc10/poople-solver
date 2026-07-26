@@ -1,8 +1,9 @@
 from poople_solver_base import PoopleSolverBase
-from tqdm import tqdm
+import time
 import json
 from pathlib import Path
 from datetime import datetime
+import statistics
 
 def get_date():
     return datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
@@ -14,7 +15,7 @@ class PoopleSolverBenchmark(PoopleSolverBase):
         self.word_dist_dict = self._load_word_dist()
 
     def _load_word_dist(self) -> dict[str, int]:
-        with open("words/wordDist.txt", "r") as f:
+        with open("words/startWords.txt", "r") as f:
             content = f.read()
         result = dict()
         for word_dist in content.split("\n"):
@@ -33,26 +34,37 @@ class PoopleSolverBenchmark(PoopleSolverBase):
 
     def print_statistics(self):
         print("===== STATISTICS REPORT =====")
+        print("=== Solver VS Official Optimal Solution Steps ===")
         print(f"Match: {self.words_benchmarked - len(self.solver_wins) - len(self.official_wins)}/{self.words_benchmarked}")
         print(f"Solver wins: {len(self.solver_wins)}/{self.words_benchmarked}")
         print(f"-> Solver win list: {self.solver_wins}")
         print(f"Official wins: {len(self.official_wins)}/{self.words_benchmarked}")
         print(f"-> Official win list: {self.official_wins}")
+        print()
+        print(f"=== Time statistics ===")
+        print(f"-> Avg: {statistics.mean(self.time_taken_per_game_ns) * 1e-6}ms")
+        print(f"-> Median: {statistics.median(self.time_taken_per_game_ns) * 1e-6}ms")
+        print(f"-> Min: {min(self.time_taken_per_game_ns) * 1e-6}ms")
+        print(f"-> Max: {max(self.time_taken_per_game_ns) * 1e-6}ms")
 
     def benchmark(self):
         try:
-            self.benchmark_statistics = dict()
+            self.benchmark_statistics = {"words": {}}
             self.words_benchmarked = 0
             self.solver_wins = []
             self.official_wins = []
+            self.time_taken_per_game_ns = []
             self.target_word = "POOP"
             for word in self.word_dist_dict:
                 self.start_word = word
-                solutions = self.solve(print_progress=False, fast=True)
+
+                timestamp = time.time_ns()
+                solutions = self.solve(print_progress=False)
+                self.time_taken_per_game_ns.append(time.time_ns() - timestamp)
 
                 solver_guesses_taken = len(solutions[0]) - 1
                 official_guesses_taken = self.word_dist_dict[word]
-                self.benchmark_statistics[word] = {
+                self.benchmark_statistics["words"][word] = {
                     "official": official_guesses_taken,
                     "solver": solver_guesses_taken
                 }
@@ -69,6 +81,7 @@ class PoopleSolverBenchmark(PoopleSolverBase):
         except KeyboardInterrupt:
             pass  # intended way of terminating
         finally:
+            self.benchmark_statistics["time_taken_per_game_ns"] = self.time_taken_per_game_ns
             self.print_statistics()
             self.save_statistics()
 
