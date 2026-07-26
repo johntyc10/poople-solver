@@ -22,7 +22,7 @@ class PoopleSolver():
     def get_possible_next_words(self, word: str) -> list[str]:
         return [w for w in self.all_words if self.is_exactly_one_letter_apart(word, w)]
 
-    def solve(self) -> list[list[str]]:
+    def solve(self) -> list[list[str]]:  # bfs search
         if self.start_word == self.target_word:
             return [self.target_word]
 
