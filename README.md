@@ -46,10 +46,6 @@ Bidirectional BFS or A* with Hamming distance are possible future optimisations,
 On Windows powershell / MacOS or Linux terminal:
 
 ```bash
-# Clone the repo and cd into the directory
-git clone https://github.com/johntyc10/poople-solver.git
-cd poople-solver
-
 # Run the solver
 python poople_solver.py
 ```
